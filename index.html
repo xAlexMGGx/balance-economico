@@ -13,6 +13,17 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-title" content="Balance" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <script>
+      // With "default", iOS paints the status bar of the installed app white. In dark mode, make it
+      // translucent instead: the app's black background shows through and the clock turns white.
+      // iOS reads this when the app starts, so it follows the mode the app was opened in.
+      if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document
+          .querySelector('meta[name="apple-mobile-web-app-status-bar-style"]')
+          .setAttribute('content', 'black-translucent');
+        document.documentElement.dataset.statusBar = 'translucent';
+      }
+    </script>
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 

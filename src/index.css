@@ -144,6 +144,25 @@
   }
 }
 
+/*
+ * Opened in dark mode (translucent status bar, white clock) and switched to light mode while open:
+ * a dark strip behind the status bar keeps the clock readable until the app is reopened.
+ * See the script in index.html.
+ */
+.status-bar-scrim {
+  display: none;
+}
+@media (prefers-color-scheme: light) {
+  html[data-status-bar='translucent'] .status-bar-scrim {
+    display: block;
+    position: fixed;
+    inset: 0 0 auto 0;
+    height: env(safe-area-inset-top);
+    background-color: #000000;
+    z-index: 70;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
