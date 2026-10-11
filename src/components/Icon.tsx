@@ -9,6 +9,8 @@ const PATHS = {
   chevronUp: <path d="m18 15-6-6-6 6" />,
   chevronDown: <path d="m6 9 6 6 6-6" />,
   check: <path d="M20 6 9 17l-5-5" />,
+  arrowUp: <path d="M12 19V5M5 12l7-7 7 7" />,
+  arrowDown: <path d="M12 5v14M19 12l-7 7-7-7" />,
   trash: <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v6M14 11v6" />,
   search: (
     <>

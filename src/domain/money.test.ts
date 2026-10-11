@@ -5,6 +5,8 @@ import {
   centsToText,
   formatCents,
   formatKeypadInput,
+  formatPercent,
+  formatPercentagePoints,
   keypadInputToCents,
   parseAmountText,
   type KeypadKey,
@@ -35,6 +37,32 @@ describe('formatCents', () => {
     expect(formatCents(1050, { signDisplay: 'always' })).toBe(eur('+10,50 €'));
     expect(formatCents(-1050, { signDisplay: 'always' })).toBe(eur(`${MINUS}10,50 €`));
     expect(formatCents(0, { signDisplay: 'always' })).toBe(eur('0,00 €'));
+  });
+});
+
+describe('percentages', () => {
+  const pct = (text: string) => text.replace(' %', `${NBSP}%`).replace(' pp', `${NBSP}pp`);
+
+  it('formats ratios with one decimal', () => {
+    expect(formatPercent(0.2345)).toBe(pct('23,5 %'));
+    expect(formatPercent(0)).toBe(pct('0,0 %'));
+    expect(formatPercent(1)).toBe(pct('100,0 %'));
+    expect(formatPercent(-0.125)).toBe(pct(`${MINUS}12,5 %`));
+    expect(formatPercent(12.3456)).toBe(pct('1.234,6 %'));
+  });
+
+  it('never shows a negative zero', () => {
+    expect(formatPercent(-0.0001)).toBe(pct('0,0 %'));
+    expect(formatPercentagePoints(-0.0001)).toBe(pct('0,0 pp'));
+  });
+
+  it('can always show the sign', () => {
+    expect(formatPercent(0.052, { signDisplay: 'always' })).toBe(pct('+5,2 %'));
+  });
+
+  it('formats percentage points with sign', () => {
+    expect(formatPercentagePoints(0.032)).toBe(pct('+3,2 pp'));
+    expect(formatPercentagePoints(-0.1)).toBe(pct(`${MINUS}10,0 pp`));
   });
 });
 

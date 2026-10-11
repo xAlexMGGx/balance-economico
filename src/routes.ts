@@ -22,4 +22,4 @@ export const SUBPAGES: Record<string, { title: string; parent: string }> = {
   '/settings/tags': { title: 'Tags', parent: '/settings' },
 };
 
-export const DEFAULT_PATH = '/transactions';
+export const DEFAULT_PATH = '/analysis';

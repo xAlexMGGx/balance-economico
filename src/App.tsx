@@ -2,6 +2,7 @@ import { HashRouter, Navigate, Route, Routes } from 'react-router';
 import { ComingSoon } from './components/ComingSoon';
 import { ConfirmProvider } from './components/ConfirmDialog';
 import { AppLayout } from './components/layout/AppLayout';
+import { AnalysisPage } from './features/analysis/AnalysisPage';
 import { AccountsPage } from './features/settings/AccountsPage';
 import { CategoriesPage } from './features/settings/CategoriesPage';
 import { GroupsPage } from './features/settings/GroupsPage';
@@ -21,10 +22,7 @@ export function App() {
             <Routes>
               <Route element={<AppLayout />}>
                 <Route index element={<Navigate to={DEFAULT_PATH} replace />} />
-                <Route
-                  path="analysis"
-                  element={<ComingSoon title="Análisis">Ahorro, gasto por grupos y comparativas llegan en la fase 2.</ComingSoon>}
-                />
+                <Route path="analysis" element={<AnalysisPage />} />
                 <Route
                   path="calendar"
                   element={<ComingSoon title="Calendario">La vista de calendario llega en la fase 3.</ComingSoon>}

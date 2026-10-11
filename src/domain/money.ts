@@ -21,6 +21,26 @@ export function formatCents(cents: Cents, { signDisplay = 'auto' }: { signDispla
   return `${sign}${groupThousands(String(euros))},${String(rest).padStart(2, '0')}${NBSP}€`;
 }
 
+/** One decimal with comma and thousands dots, with an explicit sign when asked. Avoids "−0,0". */
+function formatTenths(value: number, signDisplay: 'auto' | 'always'): string {
+  const tenths = Math.round(value * 10);
+  const abs = Math.abs(tenths);
+  let sign = '';
+  if (tenths < 0) sign = MINUS;
+  else if (signDisplay === 'always' && tenths > 0) sign = '+';
+  return `${sign}${groupThousands(String(Math.floor(abs / 10)))},${abs % 10}`;
+}
+
+/** 0.2345 → "23,5 %". */
+export function formatPercent(ratio: number, { signDisplay = 'auto' }: { signDisplay?: 'auto' | 'always' } = {}): string {
+  return `${formatTenths(ratio * 100, signDisplay)}${NBSP}%`;
+}
+
+/** Difference between two ratios in percentage points: 0.032 → "+3,2 pp". */
+export function formatPercentagePoints(deltaRatio: number): string {
+  return `${formatTenths(deltaRatio * 100, 'always')}${NBSP}pp`;
+}
+
 // --- On-screen keypad -------------------------------------------------------
 // The keypad edits a string such as "1234,5": digits, an optional comma and up to two decimals.
 

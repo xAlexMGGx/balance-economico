@@ -14,6 +14,10 @@
   --app-accent: #007aff;
   --app-income: #15803d;
   --app-expense: #dc2626;
+  /* Chart marks (bars). Validated for colour-blind separation: same as text in light mode. */
+  --app-income-mark: #15803d;
+  --app-expense-mark: #dc2626;
+  --app-track: #ececf0;
   --app-backdrop: rgb(0 0 0 / 0.35);
 }
 
@@ -29,6 +33,9 @@
     --app-accent: #0a84ff;
     --app-income: #30d158;
     --app-expense: #ff453a;
+    --app-income-mark: #1f9d55;
+    --app-expense-mark: #ff453a;
+    --app-track: #2c2c2e;
     --app-backdrop: rgb(0 0 0 / 0.6);
   }
 }
@@ -44,6 +51,9 @@
   --color-accent: var(--app-accent);
   --color-income: var(--app-income);
   --color-expense: var(--app-expense);
+  --color-income-mark: var(--app-income-mark);
+  --color-expense-mark: var(--app-expense-mark);
+  --color-track: var(--app-track);
   --color-backdrop: var(--app-backdrop);
 }
 
