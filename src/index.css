@@ -1,8 +1,11 @@
 @import 'tailwindcss';
 
-/* Semantic colours. They follow the system light/dark mode. */
+/*
+ * Semantic colours. The theme is the `data-theme` attribute set by the script in index.html:
+ * it follows the system light/dark mode (see there why the installed app keeps it until reopened).
+ */
 :root {
-  color-scheme: light dark;
+  color-scheme: light;
   --app-canvas: #f2f2f7;
   --app-surface: #ffffff;
   --app-surface-2: #e9e9ee;
@@ -26,27 +29,26 @@
   --app-backdrop: rgb(0 0 0 / 0.35);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --app-canvas: #000000;
-    --app-surface: #1c1c1e;
-    --app-surface-2: #2c2c2e;
-    --app-raised: #636366;
-    --app-fg: #f5f5f7;
-    --app-muted: #98989f;
-    --app-line: #38383a;
-    --app-accent: #0a84ff;
-    --app-income: #30d158;
-    --app-expense: #ff453a;
-    --app-income-mark: #1f9d55;
-    --app-expense-mark: #ff453a;
-    --app-track: #2c2c2e;
-    --app-heat-1: 24%;
-    --app-heat-2: 36%;
-    --app-heat-3: 48%;
-    --app-heat-4: 62%;
-    --app-backdrop: rgb(0 0 0 / 0.6);
-  }
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --app-canvas: #000000;
+  --app-surface: #1c1c1e;
+  --app-surface-2: #2c2c2e;
+  --app-raised: #636366;
+  --app-fg: #f5f5f7;
+  --app-muted: #98989f;
+  --app-line: #38383a;
+  --app-accent: #0a84ff;
+  --app-income: #30d158;
+  --app-expense: #ff453a;
+  --app-income-mark: #1f9d55;
+  --app-expense-mark: #ff453a;
+  --app-track: #2c2c2e;
+  --app-heat-1: 24%;
+  --app-heat-2: 36%;
+  --app-heat-3: 48%;
+  --app-heat-4: 62%;
+  --app-backdrop: rgb(0 0 0 / 0.6);
 }
 
 @theme inline {
@@ -141,25 +143,6 @@
   }
   button:disabled {
     cursor: default;
-  }
-}
-
-/*
- * Opened in dark mode (translucent status bar, white clock) and switched to light mode while open:
- * a dark strip behind the status bar keeps the clock readable until the app is reopened.
- * See the script in index.html.
- */
-.status-bar-scrim {
-  display: none;
-}
-@media (prefers-color-scheme: light) {
-  html[data-status-bar='translucent'] .status-bar-scrim {
-    display: block;
-    position: fixed;
-    inset: 0 0 auto 0;
-    height: env(safe-area-inset-top);
-    background-color: #000000;
-    z-index: 70;
   }
 }
 

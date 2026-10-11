@@ -4,8 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="color-scheme" content="light dark" />
-    <meta name="theme-color" content="#f2f2f7" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#f2f2f7" />
     <meta name="description" content="Tus gastos, ingresos y ahorro. Los datos se guardan solo en tu dispositivo." />
 
     <!-- Installed on the iPhone home screen: full screen, own name and icon. -->
@@ -14,15 +13,36 @@
     <meta name="apple-mobile-web-app-title" content="Balance" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <script>
-      // With "default", iOS paints the status bar of the installed app white. In dark mode, make it
-      // translucent instead: the app's black background shows through and the clock turns white.
-      // iOS reads this when the app starts, so it follows the mode the app was opened in.
-      if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        document
-          .querySelector('meta[name="apple-mobile-web-app-status-bar-style"]')
-          .setAttribute('content', 'black-translucent');
-        document.documentElement.dataset.statusBar = 'translucent';
-      }
+      // Light or dark theme, decided before the page draws (the CSS reads `data-theme`).
+      //
+      // The installed iPhone app fixes its status bar style when it opens: "default" paints a white
+      // bar, "black-translucent" lets the app's own background show through with a white clock.
+      // It cannot change while the app is open, so the installed app keeps the mode it was opened
+      // with until it is reopened, and the bar always matches the app. In the browser, the theme
+      // follows the system as soon as it changes.
+      (function () {
+        var root = document.documentElement;
+        var media = window.matchMedia('(prefers-color-scheme: dark)');
+        var installed =
+          window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
+
+        function apply(dark) {
+          root.dataset.theme = dark ? 'dark' : 'light';
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', dark ? '#000000' : '#f2f2f7');
+        }
+
+        apply(media.matches);
+        if (media.matches) {
+          document
+            .querySelector('meta[name="apple-mobile-web-app-status-bar-style"]')
+            .setAttribute('content', 'black-translucent');
+        }
+        if (!installed) {
+          media.addEventListener('change', function (event) {
+            apply(event.matches);
+          });
+        }
+      })();
     </script>
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />

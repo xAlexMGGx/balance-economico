@@ -46,7 +46,6 @@ export function AppLayout() {
       </button>
 
       <SideMenu open={menuOpen} onClose={() => setMenuOpen(false)} />
-      <div className="status-bar-scrim" aria-hidden="true" />
     </div>
   );
 }

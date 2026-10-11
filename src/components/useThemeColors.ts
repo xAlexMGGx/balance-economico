@@ -16,15 +16,14 @@ function readColors(): ThemeColors {
 
 /**
  * Resolved values of the colour tokens, for SVG attributes in charts.
- * Updates when the system switches between light and dark mode.
+ * Updates when the theme changes (the `data-theme` attribute set in index.html).
  */
 export function useThemeColors(): ThemeColors {
   const [colors, setColors] = useState(readColors);
   useEffect(() => {
-    const media = window.matchMedia('(prefers-color-scheme: dark)');
-    const update = () => setColors(readColors());
-    media.addEventListener('change', update);
-    return () => media.removeEventListener('change', update);
+    const observer = new MutationObserver(() => setColors(readColors()));
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    return () => observer.disconnect();
   }, []);
   return colors;
 }
