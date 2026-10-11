@@ -18,6 +18,11 @@
   --app-income-mark: #15803d;
   --app-expense-mark: #dc2626;
   --app-track: #ececf0;
+  /* Calendar spending scale: share of the expense colour per step. */
+  --app-heat-1: 14%;
+  --app-heat-2: 26%;
+  --app-heat-3: 38%;
+  --app-heat-4: 52%;
   --app-backdrop: rgb(0 0 0 / 0.35);
 }
 
@@ -36,6 +41,10 @@
     --app-income-mark: #1f9d55;
     --app-expense-mark: #ff453a;
     --app-track: #2c2c2e;
+    --app-heat-1: 24%;
+    --app-heat-2: 36%;
+    --app-heat-3: 48%;
+    --app-heat-4: 62%;
     --app-backdrop: rgb(0 0 0 / 0.6);
   }
 }

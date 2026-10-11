@@ -19,7 +19,7 @@ Every push to `main` is built and published to GitHub Pages by `.github/workflow
 
 ## Structure
 
-- `src/domain/` — types and pure logic (money, dates, periods, filters, balances, analytics), with tests. No React, no Dexie.
+- `src/domain/` — types and pure logic (money, dates, periods, filters, balances, analytics, calendar), with tests. No React, no Dexie.
 - `src/data/` — the only access to data: Dexie schema (`db.ts`), repositories and reactive hooks. Screens import from `src/data/index.ts`.
 - `src/components/` — reusable UI (bottom sheet, keypad, dialogs, layout).
-- `src/features/` — screens: analysis, transactions, settings (calendar in a later phase).
+- `src/features/` — screens: analysis, calendar, transactions, settings.

@@ -1,8 +1,9 @@
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { useMemo, useState } from 'react';
+import { PeriodPicker } from '../../components/PeriodPicker';
 import { Page } from '../../components/ui';
-import { useSessionState } from '../../components/useSessionState';
+import { usePeriodState } from '../../components/usePeriodState';
 import { useAccounts, useCategories, useGroups, useTransactions } from '../../data';
 import {
   type Flow,
@@ -19,35 +20,14 @@ import {
   UNGROUPED_ID,
 } from '../../domain/analytics';
 import { computeAccountBalances } from '../../domain/balances';
-import { isValidISODate, parseISODate, todayISO } from '../../domain/dates';
+import { parseISODate, todayISO } from '../../domain/dates';
 import { formatCents, formatPercent, formatPercentagePoints } from '../../domain/money';
-import {
-  formatComparisonLabel,
-  formatPeriod,
-  isSamePeriod,
-  periodContaining,
-  previousPeriod,
-  shiftPeriod,
-  type Period,
-  type PeriodKind,
-} from '../../domain/periods';
+import { formatComparisonLabel, formatPeriod, previousPeriod, type Period } from '../../domain/periods';
 import type { Account, Category, Group, Transaction } from '../../domain/types';
 import { AccountFlowCard } from './AccountFlowCard';
 import { DeltaLine, MetricRow, SectionHeader, StatTile } from './figures';
 import { formatMoneyDelta, signClass } from './format';
-import { PeriodPicker } from './PeriodPicker';
 import { SpendingDonut } from './SpendingDonut';
-
-interface PeriodState {
-  kind: PeriodKind;
-  /** Any day inside the period shown. */
-  anchor: string;
-}
-
-const isPeriodState = (value: unknown): value is PeriodState => {
-  const v = value as PeriodState;
-  return (v?.kind === 'week' || v?.kind === 'month') && typeof v.anchor === 'string' && isValidISODate(v.anchor);
-};
 
 const shortDate = (date: string) => format(parseISODate(date), 'd MMM', { locale: es });
 
@@ -58,34 +38,21 @@ export function AnalysisPage() {
   const transactions = useTransactions();
   const today = todayISO();
 
-  const [state, setState] = useSessionState<PeriodState>(
-    'analysisPeriod',
-    () => ({ kind: 'month', anchor: today }),
-    isPeriodState,
-  );
-  const period = useMemo(() => periodContaining(state.kind, state.anchor), [state.kind, state.anchor]);
-  const currentPeriod = periodContaining(state.kind, today);
-  const isCurrent = isSamePeriod(period, currentPeriod);
-  const canGoNext = period.start < currentPeriod.start;
+  const { period, isCurrent, isBeforeCurrent, shift, goToCurrent, setKind } = usePeriodState('analysisPeriod', today);
 
   if (!accounts || !categories || !groups || !transactions) return null;
-
-  const changeKind = (kind: PeriodKind) => {
-    // Keep looking at the same moment: the last day of what was shown, but never past today.
-    const end = period.end < today ? period.end : today;
-    setState({ kind, anchor: end });
-  };
 
   return (
     <Page>
       <PeriodPicker
-        kind={state.kind}
-        onKindChange={changeKind}
+        kind={period.kind}
+        onKindChange={setKind}
         label={formatPeriod(period, today)}
-        onPrevious={() => setState({ kind: state.kind, anchor: shiftPeriod(period, -1).start })}
-        onNext={() => canGoNext && setState({ kind: state.kind, anchor: shiftPeriod(period, 1).start })}
-        canGoNext={canGoNext}
-        onToday={isCurrent ? undefined : () => setState({ kind: state.kind, anchor: today })}
+        onPrevious={() => shift(-1)}
+        // Analysis stops at the current period: there is nothing to analyse in the future.
+        onNext={() => isBeforeCurrent && shift(1)}
+        canGoNext={isBeforeCurrent}
+        onToday={isCurrent ? undefined : goToCurrent}
       />
 
       {transactions.length === 0 && (

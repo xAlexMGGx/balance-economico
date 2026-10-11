@@ -3,7 +3,7 @@ import { Icon } from '../../components/Icon';
 import type { Tone, Variation } from '../../domain/analytics';
 import { formatCents } from '../../domain/money';
 import type { Cents } from '../../domain/types';
-import { DASH } from './format';
+import { DASH } from '../../components/ui';
 
 // Number blocks of the Análisis section: stat tiles, metric rows and the variation line.
 

@@ -1,6 +1,6 @@
-import { Icon } from '../../components/Icon';
-import { Segmented } from '../../components/ui';
-import type { PeriodKind } from '../../domain/periods';
+import { Icon } from './Icon';
+import { Segmented } from './ui';
+import type { PeriodKind } from '../domain/periods';
 
 const KIND_OPTIONS = [
   { value: 'week', label: 'Semana' },

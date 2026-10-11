@@ -1,10 +1,9 @@
 import { Pie, PieChart } from 'recharts';
 import { Icon } from '../../components/Icon';
-import { ColorDot } from '../../components/ui';
+import { ColorDot, DASH } from '../../components/ui';
 import { useThemeColors } from '../../components/useThemeColors';
 import type { Slice } from '../../domain/analytics';
 import { formatCents, formatPercent } from '../../domain/money';
-import { DASH } from './format';
 
 const SIZE = 200;
 

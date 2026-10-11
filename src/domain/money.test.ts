@@ -4,6 +4,7 @@ import {
   centsToKeypadInput,
   centsToText,
   formatCents,
+  formatCompactEuros,
   formatKeypadInput,
   formatPercent,
   formatPercentagePoints,
@@ -37,6 +38,26 @@ describe('formatCents', () => {
     expect(formatCents(1050, { signDisplay: 'always' })).toBe(eur('+10,50 €'));
     expect(formatCents(-1050, { signDisplay: 'always' })).toBe(eur(`${MINUS}10,50 €`));
     expect(formatCents(0, { signDisplay: 'always' })).toBe(eur('0,00 €'));
+  });
+});
+
+describe('formatCompactEuros', () => {
+  it('rounds to whole euros with thousands dots', () => {
+    expect(formatCompactEuros(2340)).toBe(eur('23 €'));
+    expect(formatCompactEuros(2350)).toBe(eur('24 €'));
+    expect(formatCompactEuros(123456)).toBe(eur('1.235 €'));
+    expect(formatCompactEuros(999949)).toBe(eur('9.999 €'));
+  });
+
+  it('abbreviates from 10.000 €', () => {
+    expect(formatCompactEuros(1000000)).toBe(eur('10k €'));
+    expect(formatCompactEuros(1234567)).toBe(eur('12k €'));
+  });
+
+  it('never shows a small amount as zero', () => {
+    expect(formatCompactEuros(0)).toBe(eur('0 €'));
+    expect(formatCompactEuros(45)).toBe(eur('<1 €'));
+    expect(formatCompactEuros(50)).toBe(eur('1 €'));
   });
 });
 

@@ -4,6 +4,7 @@ import {
   dateInMonth,
   daysInMonth,
   formatDayHeading,
+  formatLongDate,
   formatShortDate,
   isValidISODate,
   parseISODate,
@@ -93,6 +94,11 @@ describe('labels', () => {
     expect(formatDayHeading('2026-10-10', today)).toBe('Ayer');
     expect(formatDayHeading('2026-10-12', today)).toBe('Mañana');
     expect(formatShortDate('2026-10-10', today)).toBe('Ayer');
+  });
+
+  it('writes the full date even for today', () => {
+    expect(formatLongDate('2026-10-11', today)).toBe('Domingo, 11 de octubre');
+    expect(formatLongDate('2025-01-03', today)).toBe('Viernes, 3 de enero de 2025');
   });
 
   it('writes other days in Spanish', () => {

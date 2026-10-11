@@ -1,8 +1,8 @@
-import { ColorDot } from '../../components/ui';
+import { ColorDot, DASH } from '../../components/ui';
 import type { Flow } from '../../domain/analytics';
 import { formatCents } from '../../domain/money';
 import type { Account, Cents } from '../../domain/types';
-import { DASH, signClass } from './format';
+import { signClass } from './format';
 
 /**
  * A non-savings account: real balance today, and money in vs out during the period.

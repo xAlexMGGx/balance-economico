@@ -21,6 +21,20 @@ export function formatCents(cents: Cents, { signDisplay = 'auto' }: { signDispla
   return `${sign}${groupThousands(String(euros))},${String(rest).padStart(2, '0')}${NBSP}€`;
 }
 
+/**
+ * Short amount for tight spaces such as calendar cells, in whole euros:
+ * 45 → "<1 €", 2340 → "23 €", 123456 → "1.235 €", 1234567 → "12k €".
+ */
+export function formatCompactEuros(cents: Cents): string {
+  const abs = Math.abs(cents);
+  const sign = cents < 0 ? MINUS : '';
+  if (abs === 0) return `0${NBSP}€`;
+  if (abs < 50) return `<1${NBSP}€`;
+  const euros = Math.round(abs / 100);
+  if (euros < 10000) return `${sign}${groupThousands(String(euros))}${NBSP}€`;
+  return `${sign}${groupThousands(String(Math.round(euros / 1000)))}k${NBSP}€`;
+}
+
 /** One decimal with comma and thousands dots, with an explicit sign when asked. Avoids "−0,0". */
 function formatTenths(value: number, signDisplay: 'auto' | 'always'): string {
   const tenths = Math.round(value * 10);

@@ -5,6 +5,9 @@ import { Icon } from './Icon';
 
 // Small building blocks shared by every screen.
 
+/** Shown instead of a number that has no data. */
+export const DASH = '—';
+
 export const inputClass =
   'h-11 w-full rounded-xl bg-surface-2 px-3 text-base text-fg placeholder:text-muted outline-none focus:ring-2 focus:ring-accent';
 

@@ -62,13 +62,18 @@ function capitalize(text: string): string {
   return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
-/** Heading of a day in a list: "Hoy", "Ayer", "Lunes, 6 de octubre", "Viernes, 3 de enero de 2025". */
+/** Full date: "Lunes, 6 de octubre", or "Viernes, 3 de enero de 2025" when it is not this year. */
+export function formatLongDate(date: ISODate, today: ISODate): string {
+  const pattern = date.slice(0, 4) === today.slice(0, 4) ? "EEEE, d 'de' MMMM" : "EEEE, d 'de' MMMM 'de' yyyy";
+  return capitalize(format(parseISODate(date), pattern, { locale: es }));
+}
+
+/** Heading of a day in a list: "Hoy", "Ayer", "Mañana", or the full date. */
 export function formatDayHeading(date: ISODate, today: ISODate): string {
   if (date === today) return 'Hoy';
   if (date === addDays(today, -1)) return 'Ayer';
   if (date === addDays(today, 1)) return 'Mañana';
-  const pattern = date.slice(0, 4) === today.slice(0, 4) ? "EEEE, d 'de' MMMM" : "EEEE, d 'de' MMMM 'de' yyyy";
-  return capitalize(format(parseISODate(date), pattern, { locale: es }));
+  return formatLongDate(date, today);
 }
 
 /** Compact date for buttons: "Hoy", "Ayer", "Lun 6 oct", "Vie 3 ene 2025". */

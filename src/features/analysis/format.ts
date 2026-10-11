@@ -1,9 +1,6 @@
 import type { Variation } from '../../domain/analytics';
 import { formatCents, formatPercent } from '../../domain/money';
 
-/** Shown instead of a number that has no data. */
-export const DASH = '—';
-
 /** Green when positive, red when negative (savings, balances). */
 export function signClass(value: number | null): string {
   if (value === null) return 'text-muted';

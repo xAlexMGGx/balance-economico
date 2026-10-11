@@ -1,8 +1,8 @@
 import { HashRouter, Navigate, Route, Routes } from 'react-router';
-import { ComingSoon } from './components/ComingSoon';
 import { ConfirmProvider } from './components/ConfirmDialog';
 import { AppLayout } from './components/layout/AppLayout';
 import { AnalysisPage } from './features/analysis/AnalysisPage';
+import { CalendarPage } from './features/calendar/CalendarPage';
 import { AccountsPage } from './features/settings/AccountsPage';
 import { CategoriesPage } from './features/settings/CategoriesPage';
 import { GroupsPage } from './features/settings/GroupsPage';
@@ -23,10 +23,7 @@ export function App() {
               <Route element={<AppLayout />}>
                 <Route index element={<Navigate to={DEFAULT_PATH} replace />} />
                 <Route path="analysis" element={<AnalysisPage />} />
-                <Route
-                  path="calendar"
-                  element={<ComingSoon title="Calendario">La vista de calendario llega en la fase 3.</ComingSoon>}
-                />
+                <Route path="calendar" element={<CalendarPage />} />
                 <Route path="transactions" element={<TransactionsPage />} />
                 <Route path="settings" element={<SettingsPage />} />
                 <Route path="settings/accounts" element={<AccountsPage />} />
