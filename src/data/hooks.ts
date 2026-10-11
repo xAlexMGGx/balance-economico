@@ -1,6 +1,7 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { useEffect } from 'react';
 import { accountsRepo } from './repositories/accounts';
+import { backupRepo } from './repositories/backup';
 import { categoriesRepo } from './repositories/categories';
 import { groupsRepo } from './repositories/groups';
 import { recurringRepo } from './repositories/recurring';
@@ -17,6 +18,9 @@ export const useCategories = () => useLiveQuery(() => categoriesRepo.list(), [])
 export const useTags = () => useLiveQuery(() => tagsRepo.list(), []);
 export const useTransactions = () => useLiveQuery(() => transactionsRepo.list(), []);
 export const useRecurringRules = () => useLiveQuery(() => recurringRepo.list(), []);
+
+/** Everything a backup would contain right now, kept up to date. */
+export const useBackupData = () => useLiveQuery(() => backupRepo.exportData(), []);
 
 /** Months already generated for a rule; `[]` for a rule not saved yet. */
 export const useGeneratedMonths = (ruleId: string | null) =>

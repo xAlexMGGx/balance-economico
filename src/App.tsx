@@ -3,6 +3,7 @@ import { ConfirmProvider } from './components/ConfirmDialog';
 import { AppLayout } from './components/layout/AppLayout';
 import { UpdatePrompt } from './components/UpdatePrompt';
 import { AnalysisPage } from './features/analysis/AnalysisPage';
+import { BackupPage } from './features/backup/BackupPage';
 import { CalendarPage } from './features/calendar/CalendarPage';
 import { AccountsPage } from './features/settings/AccountsPage';
 import { CategoriesPage } from './features/settings/CategoriesPage';
@@ -36,6 +37,7 @@ export function App() {
                 <Route path="settings/categories" element={<CategoriesPage />} />
                 <Route path="settings/tags" element={<TagsPage />} />
                 <Route path="settings/recurring" element={<RecurringRulesPage />} />
+                <Route path="settings/backup" element={<BackupPage />} />
                 <Route path="*" element={<Navigate to={DEFAULT_PATH} replace />} />
               </Route>
             </Routes>

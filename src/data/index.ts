@@ -5,6 +5,7 @@ export { categoriesRepo } from './repositories/categories';
 export { tagsRepo } from './repositories/tags';
 export { transactionsRepo } from './repositories/transactions';
 export { recurringRepo } from './repositories/recurring';
+export { backupRepo } from './repositories/backup';
 export { settingsRepo, type SettingKey, type SettingsMap } from './repositories/settings';
 export { RepositoryError, isInUse, type Usage } from './repositories/common';
 export * from './hooks';

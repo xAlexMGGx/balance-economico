@@ -4,6 +4,10 @@ import { db } from '../db';
 export interface SettingsMap {
   /** Account preselected when adding a movement. */
   lastAccountId: string;
+  /** ISO timestamp of the last backup exported (or imported). */
+  lastBackupAt: string;
+  /** ISO timestamp until which the backup reminder stays hidden. */
+  backupReminderSnoozedUntil: string;
 }
 
 export type SettingKey = keyof SettingsMap;

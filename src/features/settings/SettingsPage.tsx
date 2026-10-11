@@ -25,6 +25,11 @@ export function SettingsPage() {
           <SettingsLink to="/settings/recurring" icon="repeat" label="Movimientos recurrentes" count={rules?.length} />
         </ListCard>
       </div>
+      <div className="mt-6">
+        <ListCard>
+          <SettingsLink to="/settings/backup" icon="shield" label="Copia de seguridad" />
+        </ListCard>
+      </div>
       <p className="mt-8 text-center text-xs text-muted">
         Tus datos se guardan solo en este dispositivo.
         <br />

@@ -24,6 +24,7 @@ import { parseISODate, todayISO } from '../../domain/dates';
 import { formatCents, formatPercent, formatPercentagePoints } from '../../domain/money';
 import { formatComparisonLabel, formatPeriod, previousPeriod, type Period } from '../../domain/periods';
 import type { Account, Category, Group, Transaction } from '../../domain/types';
+import { BackupReminder } from '../backup/BackupReminder';
 import { AccountFlowCard } from './AccountFlowCard';
 import { DeltaLine, MetricRow, SectionHeader, StatTile } from './figures';
 import { formatMoneyDelta, signClass } from './format';
@@ -54,6 +55,8 @@ export function AnalysisPage() {
         canGoNext={isBeforeCurrent}
         onToday={isCurrent ? undefined : goToCurrent}
       />
+
+      <BackupReminder hasData={transactions.length > 0} />
 
       {transactions.length === 0 && (
         <p className="mt-4 rounded-2xl bg-surface px-4 py-3 text-sm text-muted">
