@@ -8,7 +8,8 @@ interface CategoryGridProps {
   categories: Category[];
   selectedId: string | null;
   onSelect: (id: string) => void;
-  onCreate: () => void;
+  /** Shows a "Nueva" tile to create a category without leaving. */
+  onCreate?: () => void;
 }
 
 export function CategoryGrid({ type, categories, selectedId, onSelect, onCreate }: CategoryGridProps) {
@@ -16,7 +17,8 @@ export function CategoryGrid({ type, categories, selectedId, onSelect, onCreate 
     <div>
       {categories.length === 0 && (
         <p className="mb-2 text-sm text-muted">
-          Aún no tienes categorías de {type === 'expense' ? 'gasto' : 'ingreso'}. Crea la primera:
+          Aún no tienes categorías de {type === 'expense' ? 'gasto' : 'ingreso'}.
+          {onCreate ? ' Crea la primera:' : ' Créalas en Ajustes › Categorías.'}
         </p>
       )}
       <div className="grid grid-cols-4 gap-1.5" role="radiogroup" aria-label="Categoría">
@@ -38,6 +40,7 @@ export function CategoryGrid({ type, categories, selectedId, onSelect, onCreate 
             </button>
           );
         })}
+        {onCreate && (
         <button
           type="button"
           onClick={onCreate}
@@ -48,6 +51,7 @@ export function CategoryGrid({ type, categories, selectedId, onSelect, onCreate 
           </span>
           <span className="text-xs leading-tight">Nueva</span>
         </button>
+        )}
       </div>
     </div>
   );

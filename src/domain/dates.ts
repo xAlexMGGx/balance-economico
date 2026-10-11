@@ -41,6 +41,24 @@ export function toYearMonth(date: ISODate): YearMonth {
   return date.slice(0, 7);
 }
 
+const YEAR_MONTH_RE = /^(\d{4})-(0[1-9]|1[0-2])$/;
+
+export function isValidYearMonth(value: string): boolean {
+  return YEAR_MONTH_RE.test(value);
+}
+
+/** The month `n` months after (or before, if negative) `month`. */
+export function addMonths(month: YearMonth, n: number): YearMonth {
+  const [y, m] = month.split('-').map(Number);
+  const total = y * 12 + (m - 1) + n;
+  return `${Math.floor(total / 12)}-${pad2((total % 12) + 1)}`;
+}
+
+/** "oct 2026", or "octubre 2026" with `long`. */
+export function formatMonth(month: YearMonth, { long = false } = {}): string {
+  return format(parseISODate(`${month}-01`), long ? 'MMMM yyyy' : 'MMM yyyy', { locale: es });
+}
+
 export function daysInMonth(month: YearMonth): number {
   const [y, m] = month.split('-').map(Number);
   return new Date(y, m, 0).getDate();

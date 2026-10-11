@@ -6,6 +6,7 @@ export interface ConfirmOptions {
   title: string;
   message?: string;
   confirmLabel?: string;
+  cancelLabel?: string;
   /** Hide the cancel button: a plain notice with a single "OK". */
   alertOnly?: boolean;
   destructive?: boolean;
@@ -57,7 +58,7 @@ export function ConfirmProvider({ children }: { children: ReactNode }) {
               <div className="flex border-t border-line">
                 {!options.alertOnly && (
                   <button type="button" onClick={cancel} className="h-12 flex-1 border-r border-line text-accent active:bg-surface-2">
-                    Cancelar
+                    {options.cancelLabel ?? 'Cancelar'}
                   </button>
                 )}
                 <button

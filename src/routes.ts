@@ -20,6 +20,7 @@ export const SUBPAGES: Record<string, { title: string; parent: string }> = {
   '/settings/groups': { title: 'Grupos', parent: '/settings' },
   '/settings/categories': { title: 'Categorías', parent: '/settings' },
   '/settings/tags': { title: 'Tags', parent: '/settings' },
+  '/settings/recurring': { title: 'Recurrentes', parent: '/settings' },
 };
 
 export const DEFAULT_PATH = '/analysis';

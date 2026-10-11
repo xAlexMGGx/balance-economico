@@ -97,3 +97,4 @@ export type AccountDraft = Omit<Draft<Account>, 'order'>;
 export type GroupDraft = Omit<Draft<Group>, 'order'>;
 export type CategoryDraft = Omit<Draft<Category>, 'order'>;
 export type TransactionDraft = Draft<Transaction>;
+export type RecurringRuleDraft = Draft<RecurringRule>;

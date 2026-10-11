@@ -1,13 +1,14 @@
 import { Link } from 'react-router';
 import { Icon, type IconName } from '../../components/Icon';
 import { ListCard, Page } from '../../components/ui';
-import { useAccounts, useCategories, useGroups, useTags } from '../../data';
+import { useAccounts, useCategories, useGroups, useRecurringRules, useTags } from '../../data';
 
 export function SettingsPage() {
   const accounts = useAccounts();
   const groups = useGroups();
   const categories = useCategories();
   const tags = useTags();
+  const rules = useRecurringRules();
 
   return (
     <Page>
@@ -17,6 +18,11 @@ export function SettingsPage() {
         <SettingsLink to="/settings/categories" icon="grid" label="Categorías" count={categories?.length} />
         <SettingsLink to="/settings/tags" icon="tag" label="Tags" count={tags?.length} />
       </ListCard>
+      <div className="mt-6">
+        <ListCard>
+          <SettingsLink to="/settings/recurring" icon="repeat" label="Movimientos recurrentes" count={rules?.length} />
+        </ListCard>
+      </div>
     </Page>
   );
 }

@@ -6,14 +6,18 @@ import { CalendarPage } from './features/calendar/CalendarPage';
 import { AccountsPage } from './features/settings/AccountsPage';
 import { CategoriesPage } from './features/settings/CategoriesPage';
 import { GroupsPage } from './features/settings/GroupsPage';
+import { RecurringRulesPage } from './features/settings/RecurringRulesPage';
 import { SettingsPage } from './features/settings/SettingsPage';
 import { TagsPage } from './features/settings/TagsPage';
 import { AccountFilterProvider } from './features/transactions/AccountFilterProvider';
 import { TransactionSheetProvider } from './features/transactions/TransactionSheetProvider';
 import { TransactionsPage } from './features/transactions/TransactionsPage';
+import { useRecurringGeneration } from './data';
 import { DEFAULT_PATH } from './routes';
 
 export function App() {
+  useRecurringGeneration();
+
   return (
     <HashRouter>
       <ConfirmProvider>
@@ -30,6 +34,7 @@ export function App() {
                 <Route path="settings/groups" element={<GroupsPage />} />
                 <Route path="settings/categories" element={<CategoriesPage />} />
                 <Route path="settings/tags" element={<TagsPage />} />
+                <Route path="settings/recurring" element={<RecurringRulesPage />} />
                 <Route path="*" element={<Navigate to={DEFAULT_PATH} replace />} />
               </Route>
             </Routes>
