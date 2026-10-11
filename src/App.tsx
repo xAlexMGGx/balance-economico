@@ -1,6 +1,7 @@
 import { HashRouter, Navigate, Route, Routes } from 'react-router';
 import { ConfirmProvider } from './components/ConfirmDialog';
 import { AppLayout } from './components/layout/AppLayout';
+import { UpdatePrompt } from './components/UpdatePrompt';
 import { AnalysisPage } from './features/analysis/AnalysisPage';
 import { CalendarPage } from './features/calendar/CalendarPage';
 import { AccountsPage } from './features/settings/AccountsPage';
@@ -38,6 +39,7 @@ export function App() {
                 <Route path="*" element={<Navigate to={DEFAULT_PATH} replace />} />
               </Route>
             </Routes>
+            <UpdatePrompt />
           </TransactionSheetProvider>
         </AccountFilterProvider>
       </ConfirmProvider>

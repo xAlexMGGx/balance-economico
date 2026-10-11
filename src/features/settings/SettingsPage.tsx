@@ -1,3 +1,5 @@
+import { format } from 'date-fns';
+import { es } from 'date-fns/locale';
 import { Link } from 'react-router';
 import { Icon, type IconName } from '../../components/Icon';
 import { ListCard, Page } from '../../components/ui';
@@ -23,6 +25,11 @@ export function SettingsPage() {
           <SettingsLink to="/settings/recurring" icon="repeat" label="Movimientos recurrentes" count={rules?.length} />
         </ListCard>
       </div>
+      <p className="mt-8 text-center text-xs text-muted">
+        Tus datos se guardan solo en este dispositivo.
+        <br />
+        Versión del {format(new Date(__BUILD_TIME__), "d MMM yyyy, HH:mm", { locale: es })}
+      </p>
     </Page>
   );
 }

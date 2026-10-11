@@ -131,10 +131,13 @@
   textarea {
     font-size: max(16px, 1rem);
   }
-  button {
+  button,
+  a {
     cursor: pointer;
     -webkit-user-select: none;
     user-select: none;
+    /* No iOS long-press menu (for example on the keypad's delete key). */
+    -webkit-touch-callout: none;
   }
   button:disabled {
     cursor: default;
