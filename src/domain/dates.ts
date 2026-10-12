@@ -59,6 +59,28 @@ export function formatMonth(month: YearMonth, { long = false } = {}): string {
   return format(parseISODate(`${month}-01`), long ? 'MMMM yyyy' : 'MMM yyyy', { locale: es });
 }
 
+/**
+ * Months in a sentence: "octubre de 2026", "septiembre y octubre de 2026",
+ * "diciembre de 2025 y enero de 2026", or "de enero a octubre de 2026" for more than three.
+ */
+export function formatMonthList(months: readonly YearMonth[]): string {
+  if (months.length === 0) return '';
+  const sorted = [...months].sort();
+  const name = (m: YearMonth) => format(parseISODate(`${m}-01`), 'MMMM', { locale: es });
+  const year = (m: YearMonth) => m.slice(0, 4);
+  const sameYear = sorted.every((m) => year(m) === year(sorted[0]));
+  if (sorted.length > 3) {
+    const first = sorted[0];
+    const last = sorted[sorted.length - 1];
+    return sameYear
+      ? `de ${name(first)} a ${name(last)} de ${year(last)}`
+      : `de ${name(first)} de ${year(first)} a ${name(last)} de ${year(last)}`;
+  }
+  const parts = sameYear ? sorted.map(name) : sorted.map((m) => `${name(m)} de ${year(m)}`);
+  const joined = parts.length === 1 ? parts[0] : `${parts.slice(0, -1).join(', ')} y ${parts[parts.length - 1]}`;
+  return sameYear ? `${joined} de ${year(sorted[0])}` : joined;
+}
+
 export function daysInMonth(month: YearMonth): number {
   const [y, m] = month.split('-').map(Number);
   return new Date(y, m, 0).getDate();

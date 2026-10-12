@@ -127,7 +127,7 @@ describe('editing', () => {
   it('can also apply the change to the current month, and only to it', async () => {
     const { draft } = await setup({ dayOfMonth: 25 });
     const id = await recurringRepo.create(draft, TODAY);
-    await recurringRepo.update(id, { ...draft, amount: 260000, dayOfMonth: 26 }, { applyToCurrentMonth: true, today: TODAY });
+    await recurringRepo.update(id, { ...draft, amount: 260000, dayOfMonth: 26 }, { applyTo: 'currentMonth', today: TODAY });
     expect(await amountOf('2026-09')).toBe(245000);
     expect(await recurringRepo.currentMonthTransaction(id, TODAY)).toMatchObject({ amount: 260000, date: '2026-10-26' });
   });
@@ -136,9 +136,38 @@ describe('editing', () => {
     const { draft } = await setup({ dayOfMonth: 25 });
     const id = await recurringRepo.create(draft, TODAY);
     await transactionsRepo.remove((await recurringRepo.currentMonthTransaction(id, TODAY))!.id);
-    await recurringRepo.update(id, { ...draft, amount: 1 }, { applyToCurrentMonth: true, today: TODAY });
+    await recurringRepo.update(id, { ...draft, amount: 1 }, { applyTo: 'currentMonth', today: TODAY });
     expect(await recurringRepo.currentMonthTransaction(id, TODAY)).toBeUndefined();
     expect(await generatedDates()).toEqual(['2026-08-25', '2026-09-25']);
+  });
+
+  it('can apply the change to every movement already created, fixing a mistake made when creating the rule', async () => {
+    // Created on the wrong account and with the wrong day; September and October already exist.
+    const { draft, edenred, bank } = await setup({ dayOfMonth: 11, accountId: (await accountsRepo.list())[1].id });
+    const id = await recurringRepo.create(draft, TODAY);
+    // A manual edit to September, which applying to all overwrites (the user is warned).
+    const september = (await recurringRepo.existingMovements(id)).find((m) => m.month === '2026-09')!.transaction;
+    await transactionsRepo.update(september.id, { ...september, title: 'Editada a mano' });
+    // August was deleted on purpose: it must not come back.
+    const august = (await recurringRepo.existingMovements(id)).find((m) => m.month === '2026-08')!.transaction;
+    await transactionsRepo.remove(august.id);
+
+    await recurringRepo.update(id, { ...draft, accountId: bank, dayOfMonth: 25 }, { applyTo: 'allGenerated', today: TODAY });
+
+    const movements = await recurringRepo.existingMovements(id);
+    expect(movements.map((m) => [m.month, m.transaction.date, m.transaction.accountId, m.transaction.title])).toEqual([
+      ['2026-09', '2026-09-25', bank, 'Nómina'],
+      ['2026-10', '2026-10-25', bank, 'Nómina'],
+    ]);
+    expect(movements.every((m) => m.transaction.accountId !== edenred)).toBe(true);
+    expect(await recurringRepo.generatedMonths(id)).toEqual(['2026-08', '2026-09', '2026-10']);
+  });
+
+  it('lists the movements a rule created that still exist, oldest first', async () => {
+    const { draft } = await setup();
+    const id = await recurringRepo.create(draft, TODAY);
+    await transactionsRepo.remove((await recurringRepo.currentMonthTransaction(id, TODAY))!.id);
+    expect((await recurringRepo.existingMovements(id)).map((m) => m.month)).toEqual(['2026-08', '2026-09']);
   });
 
   it('generates the months that become due when the start moves earlier', async () => {

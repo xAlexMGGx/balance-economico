@@ -39,6 +39,14 @@ export function transactionFromRule(rule: RecurringRule, month: YearMonth): Tran
   };
 }
 
+/**
+ * Which movements already created by a rule take an edit of the rule:
+ * - 'future': none, only the months still to come (the default).
+ * - 'currentMonth': also this month's movement.
+ * - 'allGenerated': every movement the rule has created and still exists, overwriting manual edits.
+ */
+export type RuleChangeScope = 'future' | 'currentMonth' | 'allGenerated';
+
 /** Whether an edit changes what the generated movement looks like (not just the start or end month). */
 export function changesMovement(before: RecurringRuleDraft, after: RecurringRuleDraft): boolean {
   return (

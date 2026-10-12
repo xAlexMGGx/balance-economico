@@ -1,14 +1,15 @@
 import { useMemo, useState } from 'react';
 import { BottomSheet } from '../../components/BottomSheet';
-import { useConfirm } from '../../components/ConfirmDialog';
+import { useChoose, useConfirm, type Choice } from '../../components/ConfirmDialog';
 import { Icon } from '../../components/Icon';
 import { Button, Chip, ColorDot, Field, Segmented, Switch, inputClass, selectClass } from '../../components/ui';
 import { recurringRepo, RepositoryError, tagsRepo, useGeneratedMonths } from '../../data';
-import { addMonths, formatMonth, isValidYearMonth, todayISO, toYearMonth } from '../../domain/dates';
+import { addMonths, formatMonth, formatMonthList, isValidYearMonth, todayISO, toYearMonth } from '../../domain/dates';
 import { centsToText, parseAmountText } from '../../domain/money';
-import { changesMovement, pendingMonths } from '../../domain/recurring';
+import { changesMovement, pendingMonths, type RuleChangeScope } from '../../domain/recurring';
+import { cleanName, normalizeText } from '../../domain/text';
 import { buildTitleSuggestions, countBy, sortCategoriesByUsage, type TitleSuggestion } from '../../domain/transactions';
-import type { Account, Category, RecurringRule, RecurringRuleDraft, Tag, Transaction, TxType } from '../../domain/types';
+import type { Account, Category, RecurringRule, RecurringRuleDraft, Tag, Transaction, TxType, YearMonth } from '../../domain/types';
 import { CategoryGrid } from '../transactions/CategoryGrid';
 import { TagField } from '../transactions/TagField';
 import { TitleField } from '../transactions/TitleField';
@@ -31,6 +32,32 @@ function draftOf(rule: RecurringRule): RecurringRuleDraft {
   return draft;
 }
 
+/** Ids of the chosen tags without creating the new ones yet: a placeholder stands for each new name. */
+function tagKeysFor(names: string[], tags: Tag[]): string[] {
+  const keys: string[] = [];
+  for (const name of names.map(cleanName).filter(Boolean)) {
+    const key = tags.find((t) => normalizeText(t.name) === normalizeText(name))?.id ?? `new:${normalizeText(name)}`;
+    if (!keys.includes(key)) keys.push(key);
+  }
+  return keys;
+}
+
+const monthName = (month: YearMonth) => formatMonth(month, { long: true }).split(' ')[0];
+
+/** The answers that make sense for the movements this rule has already created. */
+function scopeChoices(months: YearMonth[], currentMonth: YearMonth): Choice<RuleChangeScope>[] {
+  const choices: Choice<RuleChangeScope>[] = [{ value: 'future', label: 'Solo meses siguientes' }];
+  const hasCurrent = months.includes(currentMonth);
+  if (hasCurrent) choices.push({ value: 'currentMonth', label: `También ${monthName(currentMonth)}` });
+  if (months.some((m) => m !== currentMonth)) {
+    choices.push({
+      value: 'allGenerated',
+      label: months.length === 1 ? `También ${monthName(months[0])}` : `Todos los ya creados (${months.length})`,
+    });
+  }
+  return choices;
+}
+
 /** What saving will create, so a start month far in the past never surprises anyone. */
 function generationPreview(pending: string[], startMonth: string, currentMonth: string, isNew: boolean): string | null {
   if (pending.length === 0) {
@@ -46,6 +73,7 @@ function generationPreview(pending: string[], startMonth: string, currentMonth: 
 
 export function RuleSheet({ rule, accounts, categories, tags, transactions, lastAccountId, onClose }: RuleSheetProps) {
   const confirm = useConfirm();
+  const choose = useChoose();
   const today = todayISO();
   const currentMonth = toYearMonth(today);
   const generated = useGeneratedMonths(rule?.id ?? null);
@@ -97,6 +125,7 @@ export function RuleSheet({ rule, accounts, categories, tags, transactions, last
     if (!canSave || amount === null || !categoryId) return;
     setBusy(true);
     try {
+      const tagNamesToSave = [...tagNames, tagQuery];
       const draft: RecurringRuleDraft = {
         type,
         amount,
@@ -104,24 +133,36 @@ export function RuleSheet({ rule, accounts, categories, tags, transactions, last
         accountId,
         categoryId,
         title: title.trim() || null,
-        tagIds: await tagsRepo.resolveNames([...tagNames, tagQuery]),
+        tagIds: tagKeysFor(tagNamesToSave, tags),
         startMonth,
         endMonth: hasEnd ? endMonth : null,
       };
       if (rule) {
-        let applyToCurrentMonth = false;
-        if (changesMovement(draftOf(rule), draft) && (await recurringRepo.currentMonthTransaction(rule.id))) {
-          applyToCurrentMonth = await confirm({
-            title: `¿Aplicar también a ${formatMonth(currentMonth, { long: true })}?`,
-            message:
-              'El movimiento de este mes ya está creado. Puedes actualizarlo con los nuevos datos o dejarlo como está y aplicar el cambio solo a los meses siguientes.',
-            confirmLabel: 'Aplicar también',
-            cancelLabel: 'Solo siguientes',
-          });
+        let applyTo: RuleChangeScope = 'future';
+        if (changesMovement(draftOf(rule), draft)) {
+          const months = (await recurringRepo.existingMovements(rule.id)).map((m) => m.month);
+          if (months.length > 0) {
+            const choices = scopeChoices(months, currentMonth);
+            const choice = await choose({
+              title: '¿Aplicar el cambio a lo ya creado?',
+              message:
+                `Esta regla ya ha creado ${months.length === 1 ? 'el movimiento' : 'los movimientos'} de ${formatMonthList(months)}.` +
+                (choices.some((c) => c.value === 'allGenerated')
+                  ? ' Si los incluyes, se sustituye también lo que hayas cambiado a mano en ellos.'
+                  : ''),
+              choices,
+            });
+            if (choice === null) {
+              setBusy(false); // cancelled: keep editing, nothing saved
+              return;
+            }
+            applyTo = choice;
+          }
         }
-        await recurringRepo.update(rule.id, draft, { applyToCurrentMonth });
+        // Only now create the new tags, once it is certain the rule is saved.
+        await recurringRepo.update(rule.id, { ...draft, tagIds: await tagsRepo.resolveNames(tagNamesToSave) }, { applyTo });
       } else {
-        await recurringRepo.create(draft);
+        await recurringRepo.create({ ...draft, tagIds: await tagsRepo.resolveNames(tagNamesToSave) });
       }
       onClose();
     } catch (e) {

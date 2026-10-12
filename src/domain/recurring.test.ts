@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { addMonths, formatMonth, isValidYearMonth } from './dates';
+import { addMonths, formatMonth, formatMonthList, isValidYearMonth } from './dates';
 import { changesMovement, monthsDue, pendingMonths, transactionFromRule } from './recurring';
 import type { RecurringRule, RecurringRuleDraft } from './types';
 
@@ -37,6 +37,16 @@ describe('month helpers', () => {
   it('names months in Spanish', () => {
     expect(formatMonth('2026-10')).toBe('oct 2026');
     expect(formatMonth('2026-10', { long: true })).toBe('octubre 2026');
+  });
+
+  it('lists months in a sentence', () => {
+    expect(formatMonthList([])).toBe('');
+    expect(formatMonthList(['2026-10'])).toBe('octubre de 2026');
+    expect(formatMonthList(['2026-10', '2026-09'])).toBe('septiembre y octubre de 2026');
+    expect(formatMonthList(['2026-08', '2026-09', '2026-10'])).toBe('agosto, septiembre y octubre de 2026');
+    expect(formatMonthList(['2025-12', '2026-01'])).toBe('diciembre de 2025 y enero de 2026');
+    expect(formatMonthList(['2026-01', '2026-02', '2026-03', '2026-10'])).toBe('de enero a octubre de 2026');
+    expect(formatMonthList(['2025-11', '2025-12', '2026-01', '2026-02'])).toBe('de noviembre de 2025 a febrero de 2026');
   });
 });
 

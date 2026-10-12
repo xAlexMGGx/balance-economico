@@ -1,5 +1,5 @@
 import { isValidYearMonth, todayISO, toYearMonth } from '../../domain/dates';
-import { pendingMonths, transactionFromRule } from '../../domain/recurring';
+import { pendingMonths, transactionFromRule, type RuleChangeScope } from '../../domain/recurring';
 import type { ISODate, RecurringRule, RecurringRuleDraft, Transaction, YearMonth } from '../../domain/types';
 import { db } from '../db';
 import { newId, nowTimestamp } from '../ids';
@@ -79,6 +79,17 @@ export const recurringRepo = {
     return occurrence ? db.transactions.get(occurrence.transactionId) : undefined;
   },
 
+  /** Movements the rule has created that still exist, oldest month first. */
+  async existingMovements(ruleId: string): Promise<Array<{ month: YearMonth; transaction: Transaction }>> {
+    const occurrences = await db.recurringOccurrences.where('ruleId').equals(ruleId).toArray();
+    const found = await Promise.all(
+      occurrences.map(async (o) => ({ month: o.month, transaction: await db.transactions.get(o.transactionId) })),
+    );
+    return found
+      .filter((f): f is { month: YearMonth; transaction: Transaction } => f.transaction !== undefined)
+      .sort((a, b) => (a.month < b.month ? -1 : 1));
+  },
+
   /** Creates the rule and, right away, the movements of its months up to the current one. */
   async create(draft: RecurringRuleDraft, today: ISODate = todayISO()): Promise<string> {
     const valid = await validate(draft);
@@ -92,14 +103,14 @@ export const recurringRepo = {
   },
 
   /**
-   * Changes the rule. Months already generated keep their movements as they are, unless
-   * `applyToCurrentMonth` is set: then the current month's movement takes the new values.
-   * Months that become due with the change (an earlier start, for example) are generated.
+   * Changes the rule. `applyTo` decides which movements it already created take the new values
+   * (see RuleChangeScope); deleted ones are never created again. Months that become due with the
+   * change (an earlier start, for example) are generated.
    */
   async update(
     id: string,
     draft: RecurringRuleDraft,
-    { applyToCurrentMonth = false, today = todayISO() }: { applyToCurrentMonth?: boolean; today?: ISODate } = {},
+    { applyTo = 'future', today = todayISO() }: { applyTo?: RuleChangeScope; today?: ISODate } = {},
   ): Promise<void> {
     const valid = await validate(draft);
     await db.transaction('rw', generationTables(), async () => {
@@ -108,10 +119,12 @@ export const recurringRepo = {
       const rule: RecurringRule = { ...current, ...valid, updatedAt: nowTimestamp() };
       await db.recurringRules.put(rule);
 
-      if (applyToCurrentMonth) {
-        const month = toYearMonth(today);
-        const tx = await recurringRepo.currentMonthTransaction(id, today);
-        if (tx) await db.transactions.update(tx.id, { ...transactionFromRule(rule, month), updatedAt: nowTimestamp() });
+      if (applyTo !== 'future') {
+        const currentMonth = toYearMonth(today);
+        for (const { month, transaction } of await recurringRepo.existingMovements(id)) {
+          if (applyTo === 'currentMonth' && month !== currentMonth) continue;
+          await db.transactions.update(transaction.id, { ...transactionFromRule(rule, month), updatedAt: nowTimestamp() });
+        }
       }
       await generateFor([rule], today);
     });
