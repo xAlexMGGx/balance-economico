@@ -9,6 +9,8 @@ import type {
   Tag,
   Transaction,
 } from '../domain/types';
+import type { SecurityConfig } from './security/config';
+import { encryptionMiddleware } from './security/middleware';
 import { createDefaultAccounts } from './seed';
 
 /**
@@ -24,6 +26,7 @@ export class BalanceDB extends Dexie {
   declare recurringRules: EntityTable<RecurringRule, 'id'>;
   declare recurringOccurrences: Table<RecurringOccurrence, [string, string]>;
   declare settings: EntityTable<Setting, 'key'>;
+  declare security: EntityTable<SecurityConfig, 'id'>;
 
   constructor() {
     super('balance-economico');
@@ -39,8 +42,16 @@ export class BalanceDB extends Dexie {
       settings: 'key',
     });
 
+    // App lock settings: wrapped data keys and the Face ID passkey. Never encrypted, never in backups.
+    this.version(2).stores({
+      security: 'id',
+    });
+
     // Runs only once, when the database is created for the first time.
     this.on('populate', (tx) => tx.table('accounts').bulkAdd(createDefaultAccounts()));
+
+    // Encrypts and decrypts records when the app lock is on (see security/middleware.ts).
+    this.use(encryptionMiddleware);
   }
 }
 

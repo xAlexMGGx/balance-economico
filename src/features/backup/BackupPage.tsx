@@ -2,7 +2,7 @@ import { useMemo, useRef, useState, type ChangeEvent } from 'react';
 import { useConfirm } from '../../components/ConfirmDialog';
 import { Icon } from '../../components/Icon';
 import { Button, Page } from '../../components/ui';
-import { backupRepo, useBackupData, useSetting } from '../../data';
+import { backupRepo, useBackupData, useLockStatus, useSetting } from '../../data';
 import {
   BACKUP_REMINDER_DAYS,
   backupFileName,
@@ -19,6 +19,7 @@ type Message = { tone: 'ok' | 'error'; text: string };
 export function BackupPage() {
   const data = useBackupData();
   const lastBackupAt = useSetting('lastBackupAt');
+  const lockStatus = useLockStatus();
   const confirm = useConfirm();
   const fileInput = useRef<HTMLInputElement>(null);
   const [message, setMessage] = useState<Message | null>(null);
@@ -115,6 +116,12 @@ export function BackupPage() {
           app no puede subirla a iCloud por su cuenta; te recordará hacer una copia si pasan más de {BACKUP_REMINDER_DAYS}{' '}
           días.
         </p>
+        {lockStatus === 'unlocked' && (
+          <p className="mt-2 text-muted">
+            La copia no va cifrada: quien tenga el archivo puede leer tus datos. Guárdala en un sitio tuyo, como tu iCloud
+            Drive.
+          </p>
+        )}
       </div>
 
       <section className="mt-6">

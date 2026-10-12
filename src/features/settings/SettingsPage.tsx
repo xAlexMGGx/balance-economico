@@ -3,7 +3,7 @@ import { es } from 'date-fns/locale';
 import { Link } from 'react-router';
 import { Icon, type IconName } from '../../components/Icon';
 import { ListCard, Page } from '../../components/ui';
-import { useAccounts, useCategories, useGroups, useRecurringRules, useTags } from '../../data';
+import { useAccounts, useCategories, useGroups, useLockStatus, useRecurringRules, useTags } from '../../data';
 
 export function SettingsPage() {
   const accounts = useAccounts();
@@ -11,6 +11,7 @@ export function SettingsPage() {
   const categories = useCategories();
   const tags = useTags();
   const rules = useRecurringRules();
+  const lockStatus = useLockStatus();
 
   return (
     <Page>
@@ -28,6 +29,12 @@ export function SettingsPage() {
       <div className="mt-6">
         <ListCard>
           <SettingsLink to="/settings/backup" icon="shield" label="Copia de seguridad" />
+          <SettingsLink
+            to="/settings/security"
+            icon="lock"
+            label="Bloqueo y cifrado"
+            detail={lockStatus === 'unlocked' ? 'Activado' : 'Desactivado'}
+          />
         </ListCard>
       </div>
       <p className="mt-8 text-center text-xs text-muted">
@@ -39,7 +46,19 @@ export function SettingsPage() {
   );
 }
 
-function SettingsLink({ to, icon, label, count }: { to: string; icon: IconName; label: string; count?: number }) {
+function SettingsLink({
+  to,
+  icon,
+  label,
+  count,
+  detail,
+}: {
+  to: string;
+  icon: IconName;
+  label: string;
+  count?: number;
+  detail?: string;
+}) {
   return (
     <li>
       <Link to={to} className="flex min-h-12 items-center gap-3 px-4 py-2.5 active:bg-surface-2">
@@ -48,6 +67,7 @@ function SettingsLink({ to, icon, label, count }: { to: string; icon: IconName; 
         </span>
         <span className="flex-1 text-[15px]">{label}</span>
         {count !== undefined && <span className="text-[15px] text-muted tabular-nums">{count}</span>}
+        {detail && <span className="text-[15px] text-muted">{detail}</span>}
         <Icon name="chevronRight" className="size-5 text-muted" />
       </Link>
     </li>

@@ -1,10 +1,12 @@
 import { useLiveQuery } from 'dexie-react-hooks';
-import { useEffect } from 'react';
+import { useEffect, useSyncExternalStore } from 'react';
 import { accountsRepo } from './repositories/accounts';
 import { backupRepo } from './repositories/backup';
 import { categoriesRepo } from './repositories/categories';
 import { groupsRepo } from './repositories/groups';
 import { recurringRepo } from './repositories/recurring';
+import { securityRepo } from './repositories/security';
+import { keyring, type LockStatus } from './security/keyring';
 import { settingsRepo, type SettingKey } from './repositories/settings';
 import { tagsRepo } from './repositories/tags';
 import { transactionsRepo } from './repositories/transactions';
@@ -18,6 +20,12 @@ export const useCategories = () => useLiveQuery(() => categoriesRepo.list(), [])
 export const useTags = () => useLiveQuery(() => tagsRepo.list(), []);
 export const useTransactions = () => useLiveQuery(() => transactionsRepo.list(), []);
 export const useRecurringRules = () => useLiveQuery(() => recurringRepo.list(), []);
+
+/** 'loading' until the app knows whether the lock is on, then 'disabled', 'locked' or 'unlocked'. */
+export const useLockStatus = (): LockStatus => useSyncExternalStore(keyring.subscribe, keyring.status);
+
+/** Whether Face ID can unlock the app (readable while locked). */
+export const useHasFaceId = () => useLiveQuery(() => securityRepo.hasFaceId(), []);
 
 /** Everything a backup would contain right now, kept up to date. */
 export const useBackupData = () => useLiveQuery(() => backupRepo.exportData(), []);

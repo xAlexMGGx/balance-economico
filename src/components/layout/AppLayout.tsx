@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, Outlet, useLocation } from 'react-router';
+import { useRecurringGeneration } from '../../data';
 import { useTransactionSheet } from '../../features/transactions/TransactionSheetProvider';
 import { SECTIONS, SUBPAGES } from '../../routes';
 import { Icon } from '../Icon';
@@ -11,6 +12,7 @@ export function AppLayout() {
   const { pathname } = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
   const { openNew } = useTransactionSheet();
+  useRecurringGeneration();
 
   const subpage = SUBPAGES[pathname];
   const title = subpage?.title ?? SECTIONS.find((s) => pathname.startsWith(s.path))?.title ?? '';

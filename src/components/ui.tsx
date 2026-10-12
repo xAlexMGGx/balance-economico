@@ -34,12 +34,15 @@ export function Button({
 }
 
 export function Field({ label, children, hint }: { label: string; children: ReactNode; hint?: string }) {
+  // The hint stays outside the label, so it is not read as part of the field's name.
   return (
-    <label className="block">
-      <span className="mb-1.5 block text-sm font-medium text-muted">{label}</span>
-      {children}
-      {hint && <span className="mt-1 block text-xs text-muted">{hint}</span>}
-    </label>
+    <div>
+      <label className="block">
+        <span className="mb-1.5 block text-sm font-medium text-muted">{label}</span>
+        {children}
+      </label>
+      {hint && <p className="mt-1 text-xs text-muted">{hint}</p>}
+    </div>
   );
 }
 

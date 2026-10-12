@@ -22,6 +22,7 @@ export const SUBPAGES: Record<string, { title: string; parent: string }> = {
   '/settings/tags': { title: 'Tags', parent: '/settings' },
   '/settings/recurring': { title: 'Recurrentes', parent: '/settings' },
   '/settings/backup': { title: 'Copia de seguridad', parent: '/settings' },
+  '/settings/security': { title: 'Bloqueo y cifrado', parent: '/settings' },
 };
 
 export const DEFAULT_PATH = '/analysis';
